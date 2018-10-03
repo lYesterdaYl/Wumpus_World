@@ -46,7 +46,7 @@ class MyAI ( Agent ):
     def getAction( self, stench, breeze, glitter, bump, scream ):
         self.store_information(stench, breeze, glitter, bump, scream)
         self._world_map.update_current_position(self._current_status)
-        self._world_map.swap_position()
+        # self._world_map.swap_position()
         self._world_map.show_map()
 
 
@@ -55,6 +55,10 @@ class World_Map:
         self._x = 0
         self._y = 0
         self._map = [["" for x in range(4)] for x in range(4)]
+
+        self._current_direction = ''
+        self._number_of_move = 0
+        self._current_status = {}
 
         self._safe_position = [[False for x in range(4)] for y in range(4)]
         self._breeze_position = [[False for x in range(4)] for y in range(4)]
@@ -116,23 +120,9 @@ class World_Map:
             Agent.Action.FORWARD
             self.current_position = (x, y - 1)
             self._number_of_move += 1
+
     def show_map(self):
         # self._map[0][1] = 2
-        print("world map is ", self._map)
-        # print(self._map[0][0])
-
-    def update_current_position(self, current_status):
-        if current_status['stench']: self._map[self._x][self._y] += ' S '
-        if current_status['breeze']: self._map[self._x][self._y] += ' B '
-        if current_status['glitter']: self._map[self._x][self._y] += ' G '
-
-        self._current_direction = ''
-        self._number_of_move = 0
-        self._current_status = {}
-        self._map = [["" for x in range(4)] for x in range(4)]
-
-    def show_map(self):
-        self._map[0][1] = 2
         print("world map is ", self._map)
         # print(self._map[0][0])
 
@@ -146,9 +136,11 @@ class World_Map:
         self._map[2] = temp
 
     def update_current_position(self, current_status):
-        if current_status['stench']: self._map[self._y][self._x] += ' S '
-        if current_status['breeze']: self._map[self._y][self._x] += ' B '
-        if current_status['glitter']: self._map[self._y][self._x] += ' G '
+        status_list = self._map[self._x][self._y].split(" ")
+
+        if current_status['stench'] and 'S' not in status_list: self._map[self._x][self._y] += ' S '
+        if current_status['breeze'] and 'B' not in status_list: self._map[self._x][self._y] += ' B '
+        if current_status['glitter'] and 'G' not in status_list: self._map[self._x][self._y] += ' G '
         self._current_status = current_status
 
     def analysis(self):
