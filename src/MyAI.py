@@ -22,30 +22,30 @@ from Agent import Agent
 class MyAI ( Agent ):
 
     def __init__ ( self ):
-        # ======================================================================
-        # YOUR CODE BEGINS
-        # ======================================================================
-        
-        pass
-        # ======================================================================
-        # YOUR CODE ENDS
-        # ======================================================================
+        self.__current_direction = ''
+        self.__number_of_move = 0
+        self.__current_status = {}
+
+    def store_information(self, stench, breeze, glitter, bump, scream):
+        self.__current_status['stench'] = stench
+        self.__current_status['breeze'] = breeze
+        self.__current_status['glitter'] = glitter
+        self.__current_status['bump'] = bump
+        self.__current_status['scream'] = scream
+        print(self.__current_status)
+
+
+    def analysis(self):
+        if(self.__number_of_move == 0 and self.__current_status['breeze'] == True):
+            return Agent.Action.CLIMB
+
+
 
     def getAction( self, stench, breeze, glitter, bump, scream ):
-        # ======================================================================
-        # YOUR CODE BEGINS
-        # ======================================================================
-        
-        return Agent.Action.CLIMB
-        # ======================================================================
-        # YOUR CODE ENDS
-        # ======================================================================
-    
-    # ======================================================================
-    # YOUR CODE BEGINS
-    # ======================================================================
+        self.store_information(stench, breeze, glitter, bump, scream)
 
-    
-    # ======================================================================
-    # YOUR CODE ENDS
-    # ======================================================================
+        feedback = self.analysis()
+
+
+        self.__number_of_move += 1
+        return feedback

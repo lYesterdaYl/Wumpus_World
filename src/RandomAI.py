@@ -19,7 +19,7 @@ class RandomAI ( Agent ):
 
     def getAction ( self, stench, breeze, glitter, bump, scream ):
         if glitter:
-            return Agent.Action.GRAB;
+            return Agent.Action.GRAB
 
         return self.__actions [ random.randrange ( len ( self.__actions ) ) ]
     

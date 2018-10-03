@@ -47,7 +47,6 @@ from World import World
 
 def main ( ):
     args = sys.argv
-    
     if len(args) == 1:
         # Run on a random world and exit
         world = World()
