@@ -22,16 +22,16 @@ from Agent import Agent
 class MyAI ( Agent ):
 
     def __init__ ( self ):
-        self.__current_direction = ''
-        self.__number_of_move = 0
-        self.__current_status = {}
+        self._current_direction = ''
+        self._number_of_move = 0
+        self._current_status = {}
 
     def store_information(self, stench, breeze, glitter, bump, scream):
-        self.__current_status['stench'] = stench
-        self.__current_status['breeze'] = breeze
-        self.__current_status['glitter'] = glitter
-        self.__current_status['bump'] = bump
-        self.__current_status['scream'] = scream
+        self._current_status['stench'] = stench
+        self._current_status['breeze'] = breeze
+        self._current_status['glitter'] = glitter
+        self._current_status['bump'] = bump
+        self._current_status['scream'] = scream
         print(self.__current_status)
 
 
@@ -49,3 +49,9 @@ class MyAI ( Agent ):
 
         self.__number_of_move += 1
         return feedback
+
+class Map:
+
+    def __init__(self):
+        self._x = 0
+        self._y = 0
