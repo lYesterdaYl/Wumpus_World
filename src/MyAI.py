@@ -33,44 +33,7 @@ class MyAI ( Agent ):
         self._current_status['glitter'] = glitter
         self._current_status['bump'] = bump
         self._current_status['scream'] = scream
-<<<<<<< HEAD
-        print(self._current_status)
 
-        x, y = self.current_position
-        # check neighbor
-        up = self._breeze_position[x][y + 1]
-        right = self._breeze_position[x + 1][y]
-        down = self._breeze_position[x][y - 1]
-        left = self._breeze_position[x - 1][y]
-
-        self._current_status['stench'] = stench
-        self._current_status['breeze'] = breeze
-        self._current_status['glitter'] = glitter
-        self._current_status['bump'] = bump
-        self._current_status['scream'] = scream
-
-        if breeze:
-            self._breeze_position[x][y] = True
-            #de
-            if up and right:
-                self.__pit_location[x + 1][y + 1] = True
-            elif right and down:
-                self.__pit_location[x - 1][y - 1] = True
-            elif not up and right:
-                self._safe_position[x + 1][y + 1] = True
-
-        if stench:
-            self._stench_position = [x][y]
-
-        print(self._current_status)
-
-
-
-    def analysis(self):
-        if(self._number_of_move == 0 and self._current_status['breeze'] == True):
-            return Agent.Action.CLIMB
-=======
->>>>>>> 33bf6064f89bb3aa620c0b43750100b1376e1fb7
 
         print(self._current_status)
 
@@ -86,28 +49,11 @@ class MyAI ( Agent ):
         self._world_map.swap_position()
         self._world_map.show_map()
 
-<<<<<<< HEAD
-        feedback = self.analysis()
-        if breeze and self._number_of_move >=1:
-            self.moveTo(0,0)
-
-
-
-        self._number_of_move += 1
-        return feedback
-=======
-        feedback = self._world_map.analysis()
-
-        return feedback
-
-class World_Map:
->>>>>>> 33bf6064f89bb3aa620c0b43750100b1376e1fb7
 
 class World_Map:
     def __init__(self):
         self._x = 0
         self._y = 0
-<<<<<<< HEAD
         self._map = [["" for x in range(4)] for x in range(4)]
 
         self._safe_position = [[False for x in range(4)] for y in range(4)]
@@ -179,7 +125,7 @@ class World_Map:
         if current_status['stench']: self._map[self._x][self._y] += ' S '
         if current_status['breeze']: self._map[self._x][self._y] += ' B '
         if current_status['glitter']: self._map[self._x][self._y] += ' G '
-=======
+
         self._current_direction = ''
         self._number_of_move = 0
         self._current_status = {}
@@ -208,5 +154,5 @@ class World_Map:
     def analysis(self):
         if (self._number_of_move == 0 and self._current_status['breeze'] == True):
             return Agent.Action.CLIMB
->>>>>>> 33bf6064f89bb3aa620c0b43750100b1376e1fb7
+
 
