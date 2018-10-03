@@ -43,3 +43,4 @@ venv/Scripts/winsound.pyd
 .idea/modules.xml
 *.pyc
 *.xml
+.DS_Store
