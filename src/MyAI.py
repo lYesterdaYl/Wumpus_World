@@ -26,17 +26,48 @@ class MyAI ( Agent ):
         self._number_of_move = 0
         self._current_status = {}
 
+
+
     def store_information(self, stench, breeze, glitter, bump, scream):
         self._current_status['stench'] = stench
         self._current_status['breeze'] = breeze
         self._current_status['glitter'] = glitter
         self._current_status['bump'] = bump
         self._current_status['scream'] = scream
-        print(self.__current_status)
+        print(self._current_status)
+
+        x, y = self.current_position
+        # check neighbor
+        up = self._breeze_position[x][y + 1]
+        right = self._breeze_position[x + 1][y]
+        down = self._breeze_position[x][y - 1]
+        left = self._breeze_position[x - 1][y]
+
+        self._current_status['stench'] = stench
+        self._current_status['breeze'] = breeze
+        self._current_status['glitter'] = glitter
+        self._current_status['bump'] = bump
+        self._current_status['scream'] = scream
+
+        if breeze:
+            self._breeze_position[x][y] = True
+            #de
+            if up and right:
+                self.__pit_location[x + 1][y + 1] = True
+            elif right and down:
+                self.__pit_location[x - 1][y - 1] = True
+            elif not up and right:
+                self._safe_position[x + 1][y + 1] = True
+
+        if stench:
+            self._stench_position = [x][y]
+
+        print(self._current_status)
+
 
 
     def analysis(self):
-        if(self.__number_of_move == 0 and self.__current_status['breeze'] == True):
+        if(self._number_of_move == 0 and self._current_status['breeze'] == True):
             return Agent.Action.CLIMB
 
 
@@ -45,13 +76,87 @@ class MyAI ( Agent ):
         self.store_information(stench, breeze, glitter, bump, scream)
 
         feedback = self.analysis()
+        if breeze and self._number_of_move >=1:
+            self.moveTo(0,0)
 
 
-        self.__number_of_move += 1
+
+        self._number_of_move += 1
         return feedback
 
-class Map:
-
+class World_Map:
     def __init__(self):
         self._x = 0
         self._y = 0
+        self._map = [["" for x in range(4)] for x in range(4)]
+
+        self._safe_position = [[False for x in range(4)] for y in range(4)]
+        self._breeze_position = [[False for x in range(4)] for y in range(4)]
+        self._stench_position = [[False for x in range(4)] for y in range(4)]
+        self._Pit_position = [[False for x in range(4)] for y in range(4)]
+        self.current_position = (0, 0)
+
+    def moveTo(self, dx, dy):
+        x, y = self.current_position
+        # go left
+        if dx < x:
+            if self._current_direction == 'right':
+                Agent.Action.TURN_RIGHT
+                Agent.Action.TURN_RIGHT
+            if self._current_direction == 'up':
+                Agent.Action.TURN_LEFT
+            if self._current_direction == 'down':
+                Agent.Action.TURN_RIGHT
+            self._current_direction = 'left'
+            Agent.Action.FORWARD
+            self.current_position = (x - 1, y)
+            self._number_of_move += 1
+        # go right
+        if dx > x:
+            if self._current_direction == 'left':
+                Agent.Action.TURN_LEFT
+                Agent.Action.TURN_LEFT
+            if self._current_direction == 'up':
+                Agent.Action.TURN_RIGHT
+            if self._current_direction == 'down':
+                Agent.Action.TURN_LEFT
+            self._current_direction = 'right'
+            Agent.Action.FORWARD
+            self.current_position = (x + 1, y)
+            self._number_of_move += 1
+        # go up
+        if dy > y:
+            if self._current_direction == 'left':
+                Agent.Action.TURN_RIGHT
+            if self._current_direction == 'right':
+                Agent.Action.TURN_LEFT
+            if self._current_direction == 'down':
+                Agent.Action.TURN_LEFT
+                Agent.Action.TURN_LEFT
+            self._current_direction = 'up'
+            Agent.Action.FORWARD
+            self.current_position = (x, y + 1)
+            self._number_of_move += 1
+        # go down
+        if dy < y:
+            if self._current_direction == 'left':
+                Agent.Action.TURN_RIGHT
+            if self._current_direction == 'right':
+                Agent.Action.TURN_LEFT
+            if self._current_direction == 'down':
+                Agent.Action.TURN_LEFT
+                Agent.Action.TURN_LEFT
+            self._current_direction = 'down'
+            Agent.Action.FORWARD
+            self.current_position = (x, y - 1)
+            self._number_of_move += 1
+    def show_map(self):
+        # self._map[0][1] = 2
+        print("world map is ", self._map)
+        # print(self._map[0][0])
+
+    def update_current_position(self, current_status):
+        if current_status['stench']: self._map[self._x][self._y] += ' S '
+        if current_status['breeze']: self._map[self._x][self._y] += ' B '
+        if current_status['glitter']: self._map[self._x][self._y] += ' G '
+
