@@ -49,10 +49,14 @@ class MyAI ( Agent ):
         # self._world_map.swap_position()
         self._world_map.show_map()
 
-        (x, y) = self._world_map.analysis()
-        if self.tmp == []:
-            self.tmp = self._world_map.moveTo(x,y)
-        return self._world_map.actionlist.pop(0)
+        result = self._world_map.analysis()
+        print("result = ", result)
+        if result[0] == 'ACTION':
+            return self._world_map.actionlist.pop(0)
+        elif result[0] == 'MOVEMENT':
+            if self.tmp == []:
+                self.tmp = self._world_map.moveTo(result[1][0],result[1][1])
+            return self._world_map.actionlist.pop(0)
 
 
 class World_Map:
@@ -149,11 +153,11 @@ class World_Map:
         # print(self._map[0][0])
 
     def update_current_position(self, current_status):
-        status_list = self._map[self._x][self._y].split(" ")
+        status_list = self._map[self.current_position[0]][self.current_position[1]].split(" ")
 
-        if current_status['stench'] and 'S' not in status_list: self._map[self._x][self._y] += ' S '
-        if current_status['breeze'] and 'B' not in status_list: self._map[self._x][self._y] += ' B '
-        if current_status['glitter'] and 'G' not in status_list: self._map[self._x][self._y] += ' G '
+        if current_status['stench'] and 'S' not in status_list: self._map[self.current_position[0]][self.current_position[1]] += ' S '
+        if current_status['breeze'] and 'B' not in status_list: self._map[self.current_position[0]][self.current_position[1]] += ' B '
+        if current_status['glitter'] and 'G' not in status_list: self._map[self.current_position[0]][self.current_position[1]] += ' G '
         self._current_status = current_status
 
     def get_current_direction_forward_position(self):
@@ -168,11 +172,13 @@ class World_Map:
     def analysis(self):
         self.has_visited.append(self.current_position)
         if self.current_position == (0, 0) and self._current_status['breeze'] == True:
-            return Agent.Action.CLIMB
+            self.actionlist.append(Agent.Action.CLIMB)
+            return ['ACTION']
+
 
         if self.get_current_direction_forward_position() not in self.has_visited and not self._current_status['stench'] and not self._current_status['breeze']:
 
             self.has_visited.append(self.get_current_direction_forward_position())
-            return self.get_current_direction_forward_position()
+            return ['MOVEMENT', self.get_current_direction_forward_position()]
 
 
