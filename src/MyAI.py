@@ -48,9 +48,10 @@ class MyAI ( Agent ):
         self._world_map.update_current_position(self._current_status)
         # self._world_map.swap_position()
         self._world_map.show_map()
+
+        (x, y) = self._world_map.analysis()
         if self.tmp == []:
-            self.tmp = self._world_map.moveTo(0,1)
-            self.tmp = self._world_map.moveTo(1,1)
+            self.tmp = self._world_map.moveTo(x,y)
         return self._world_map.actionlist.pop(0)
 
 
@@ -63,6 +64,9 @@ class World_Map:
         self._current_direction = 'right'
         self._number_of_move = 0
         self._current_status = {}
+
+        self.has_visited = []
+        self._store_point = {}
 
         self._safe_position = [[False for x in range(4)] for y in range(4)]
         self._breeze_position = [[False for x in range(4)] for y in range(4)]
@@ -144,15 +148,6 @@ class World_Map:
         print("world map is ", self._map)
         # print(self._map[0][0])
 
-    def swap_position(self):
-        temp = self._map[0]
-        self._map[0] = self._map[3]
-        self._map[3] = temp
-
-        temp = self._map[1]
-        self._map[1] = self._map[2]
-        self._map[2] = temp
-
     def update_current_position(self, current_status):
         status_list = self._map[self._x][self._y].split(" ")
 
@@ -161,8 +156,23 @@ class World_Map:
         if current_status['glitter'] and 'G' not in status_list: self._map[self._x][self._y] += ' G '
         self._current_status = current_status
 
+    def get_current_direction_forward_position(self):
+        if self._current_direction == 'right':
+            return (self.current_position[0] + 1, self.current_position[1])
+        elif self._current_direction == 'left':
+            return (self.current_position[0] - 1, self.current_position[1])
+        elif self._current_direction == 'up':
+            return (self.current_position[0], self.current_position[1] + 1)
+        elif self._current_direction == 'down':
+            return (self.current_position[0], self.current_position[1] - 1)
     def analysis(self):
-        if (self._number_of_move == 0 and self._current_status['breeze'] == True):
+        self.has_visited.append(self.current_position)
+        if self.current_position == (0, 0) and self._current_status['breeze'] == True:
             return Agent.Action.CLIMB
+
+        if self.get_current_direction_forward_position() not in self.has_visited and not self._current_status['stench'] and not self._current_status['breeze']:
+
+            self.has_visited.append(self.get_current_direction_forward_position())
+            return self.get_current_direction_forward_position()
 
 
