@@ -86,6 +86,7 @@ class World_Map:
         self.actionlist=[]
 
     def moveTo(self, dx, dy):
+        print('direction',self._current_direction)
         x, y = self.current_position
         # go left
         if dx < x:
@@ -132,7 +133,7 @@ class World_Map:
                 self.actionlist.append(Agent.Action.TURN_RIGHT)
             if self._current_direction == 'right':
                 self.actionlist.append(Agent.Action.TURN_LEFT)
-            if self._current_direction == 'down':
+            if self._current_direction == 'up':
                 self.actionlist.append(Agent.Action.TURN_LEFT)
                 self.actionlist.append(Agent.Action.TURN_LEFT)
             self._current_direction = 'down'
@@ -181,7 +182,7 @@ class World_Map:
     def check_current_position_available_direction(self):
         self.available_position[self.current_position] = []
         print("available position status", self._current_status)
-        if not self._current_status['stench'] or not self._current_status['breeze']:
+        if not self._current_status['stench'] and not self._current_status['breeze']:
             if (self.current_position[0] + 1, self.current_position[1]) not in self.has_visited:
                 self.available_position[self.current_position].append((self.current_position[0] + 1, self.current_position[1]))
             if (self.current_position[0] - 1, self.current_position[1]) not in self.has_visited and self.current_position[0] - 1 >= 0:
