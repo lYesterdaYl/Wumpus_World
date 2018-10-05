@@ -54,6 +54,14 @@ class MyAI ( Agent ):
             print("result = ", result)
             if result[0] == 'ACTION':
                 return self._world_map.actionlist.pop(0)
+            elif result[0] == 'RETURN':
+                if self._world_map.actionlist == []:
+                    self._world_map.actionlist.append(Agent.Action.GRAB)
+                    x,y =result[2].pop()
+                    self._world_map.moveTo(x,y)
+                    return self._world_map.actionlist.pop(0)
+
+
             elif result[0] == 'MOVEMENT':
                 if self._world_map.actionlist == []:
                     self._world_map.moveTo(result[1][0],result[1][1])
@@ -74,6 +82,7 @@ class World_Map:
         self._current_status = {}
 
         self.has_visited = []
+        self.explored = []
         self.available_position = {}
 
         self._store_point = {}
@@ -130,9 +139,9 @@ class World_Map:
         # go down
         if dy < y:
             if self._current_direction == 'left':
-                self.actionlist.append(Agent.Action.TURN_RIGHT)
-            if self._current_direction == 'right':
                 self.actionlist.append(Agent.Action.TURN_LEFT)
+            if self._current_direction == 'right':
+                self.actionlist.append(Agent.Action.TURN_RIGHT)
             if self._current_direction == 'up':
                 self.actionlist.append(Agent.Action.TURN_LEFT)
                 self.actionlist.append(Agent.Action.TURN_LEFT)
@@ -196,14 +205,27 @@ class World_Map:
     def analysis(self):
         print("action list = ", self.actionlist)
         self.has_visited.append(self.current_position)
-
+        self.explored.append(self.current_position)
         if self.current_position == (0, 0) and self._current_status['breeze'] == True:
             self.actionlist.append(Agent.Action.CLIMB)
             return ['ACTION']
 
+        if self.current_position == (0, 0) and self._current_status['stench'] == True:
+            self.actionlist.append(Agent.Action.SHOOT)
+            return ['ACTION']
+
+        if self._current_status['glitter'] == True:
+            return ['GRAB',(0, 0),self.has_visited]
+
+
         if self.current_position not in self.available_position.keys():
             self.check_current_position_available_direction()
 
+        for k,v in self.available_position.items():
+            if v is not None:
+                for remaining_spot in v:
+                    if remaining_spot not in self.explored:
+                        return ['MOVEMENT',remaining_spot]
         print("has visited = ", self.has_visited)
         print("available position = ", self.available_position)
         print("available position keys = ", self.available_position.keys())
@@ -218,7 +240,9 @@ class World_Map:
         else:
             print(2)
             next_spot = self.has_visited.pop()
+            self.explored = next_spot
             next_spot = self.has_visited.pop()
+            self.explored = next_spot
 
             return ['MOVEMENT', next_spot]
 
