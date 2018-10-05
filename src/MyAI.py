@@ -49,14 +49,16 @@ class MyAI ( Agent ):
         # self._world_map.swap_position()
         self._world_map.show_map()
 
-        result = self._world_map.analysis()
-        print("result = ", result)
-        if result[0] == 'ACTION':
-            return self._world_map.actionlist.pop(0)
-        elif result[0] == 'MOVEMENT':
-            if self.tmp == []:
-                self.tmp = self._world_map.moveTo(result[1][0],result[1][1])
-            return self._world_map.actionlist.pop(0)
+        if len(self._world_map.actionlist) == 0:
+            result = self._world_map.analysis()
+            print("result = ", result)
+            if result[0] == 'ACTION':
+                return self._world_map.actionlist.pop(0)
+            elif result[0] == 'MOVEMENT':
+                print("movement: ", self._world_map.actionlist)
+                if self._world_map.actionlist == []:
+                    self._world_map.moveTo(result[1][0],result[1][1])
+                return self._world_map.actionlist.pop(0)
 
 
 class World_Map:
@@ -70,6 +72,8 @@ class World_Map:
         self._current_status = {}
 
         self.has_visited = []
+        self.available_position = {}
+
         self._store_point = {}
 
         self._safe_position = [[False for x in range(4)] for y in range(4)]
@@ -141,9 +145,9 @@ class World_Map:
         # print(self._map[0][0])
 
     def update_current_position(self, current_status):
-        if current_status['stench']: self._map[self._x][self._y] += ' S '
-        if current_status['breeze']: self._map[self._x][self._y] += ' B '
-        if current_status['glitter']: self._map[self._x][self._y] += ' G '
+        if current_status['stench']: self._map[self.current_position[0]][self.current_position[1]] += ' S '
+        if current_status['breeze']: self._map[self.current_position[0]][self.current_position[1]] += ' B '
+        if current_status['glitter']: self._map[self.current_position[0]][self.current_position[1]] += ' G '
 
         self._current_status = current_status
 
@@ -153,6 +157,7 @@ class World_Map:
         # print(self._map[0][0])
 
     def update_current_position(self, current_status):
+        print("update_current_position status = ", current_status)
         status_list = self._map[self.current_position[0]][self.current_position[1]].split(" ")
 
         if current_status['stench'] and 'S' not in status_list: self._map[self.current_position[0]][self.current_position[1]] += ' S '
@@ -160,6 +165,7 @@ class World_Map:
         if current_status['glitter'] and 'G' not in status_list: self._map[self.current_position[0]][self.current_position[1]] += ' G '
         self._current_status = current_status
 
+    #get next forward cordinate for moveTo
     def get_current_direction_forward_position(self):
         if self._current_direction == 'right':
             return (self.current_position[0] + 1, self.current_position[1])
@@ -169,16 +175,54 @@ class World_Map:
             return (self.current_position[0], self.current_position[1] + 1)
         elif self._current_direction == 'down':
             return (self.current_position[0], self.current_position[1] - 1)
+
+    def check_current_position_available_direction(self):
+        self.available_position[self.current_position] = []
+        print("available position status", self._current_status)
+        if not self._current_status['stench'] or not self._current_status['breeze']:
+            if (self.current_position[0] + 1, self.current_position[1]) not in self.has_visited:
+                self.available_position[self.current_position].append((self.current_position[0] + 1, self.current_position[1]))
+            if (self.current_position[0] - 1, self.current_position[1]) not in self.has_visited and self.current_position[0] - 1 >= 0:
+                self.available_position[self.current_position].append((self.current_position[0] - 1, self.current_position[1]))
+            if (self.current_position[0], self.current_position[1] + 1) not in self.has_visited:
+                self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] + 1))
+            if (self.current_position[0], self.current_position[1] - 1) not in self.has_visited and self.current_position[1] - 1 >= 0:
+                self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] - 1))
+
+
     def analysis(self):
+        print("action list = ", self.actionlist)
         self.has_visited.append(self.current_position)
+
         if self.current_position == (0, 0) and self._current_status['breeze'] == True:
             self.actionlist.append(Agent.Action.CLIMB)
             return ['ACTION']
 
+        if self.current_position not in self.available_position.keys():
+            self.check_current_position_available_direction()
 
-        if self.get_current_direction_forward_position() not in self.has_visited and not self._current_status['stench'] and not self._current_status['breeze']:
+        print("has visited = ", self.has_visited)
+        print("available position = ", self.available_position)
+        print("available position keys = ", self.available_position.keys())
+        print("current position = ", self.current_position)
+        print("current status = ", self._current_status)
 
-            self.has_visited.append(self.get_current_direction_forward_position())
-            return ['MOVEMENT', self.get_current_direction_forward_position()]
+        if len(self.available_position[self.current_position]) > 0:
+            print(1)
+            next_spot = self.available_position[self.current_position].pop()
+            # self.available_position[self.current_position].append(next_spot)
+            return ['MOVEMENT', next_spot]
+        else:
+            print(2)
+            next_spot = self.has_visited.pop()
+            next_spot = self.has_visited.pop()
+
+            return ['MOVEMENT', next_spot]
+
+        # #if forward position has't visited yet, visit it.
+        # if self.get_current_direction_forward_position() not in self.has_visited and not self._current_status['stench'] and not self._current_status['breeze']:
+        #     self.has_visited.append(self.get_current_direction_forward_position())
+        #     return ['MOVEMENT', self.get_current_direction_forward_position()]
+
 
 
