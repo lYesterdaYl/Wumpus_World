@@ -55,9 +55,9 @@ class MyAI ( Agent ):
             if result[0] == 'ACTION':
                 return self._world_map.actionlist.pop(0)
             elif result[0] == 'MOVEMENT':
-                print("movement: ", self._world_map.actionlist)
                 if self._world_map.actionlist == []:
                     self._world_map.moveTo(result[1][0],result[1][1])
+                    print("movement: ", self._world_map.actionlist)
                     return self._world_map.actionlist.pop(0)
         else:
             return self._world_map.actionlist.pop(0)
