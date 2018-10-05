@@ -86,6 +86,7 @@ class World_Map:
         self.actionlist=[]
 
     def moveTo(self, dx, dy):
+        print('direction',self._current_direction)
         x, y = self.current_position
         # go left
         if dx < x:
@@ -132,7 +133,7 @@ class World_Map:
                 self.actionlist.append(Agent.Action.TURN_RIGHT)
             if self._current_direction == 'right':
                 self.actionlist.append(Agent.Action.TURN_LEFT)
-            if self._current_direction == 'down':
+            if self._current_direction == 'up':
                 self.actionlist.append(Agent.Action.TURN_LEFT)
                 self.actionlist.append(Agent.Action.TURN_LEFT)
             self._current_direction = 'down'
