@@ -54,14 +54,13 @@ class MyAI ( Agent ):
             print("result = ", result)
             if result[0] == 'ACTION':
                 return self._world_map.actionlist.pop(0)
-            elif result[0] == 'RETURN':
+            elif result[0] == 'GRAB':
                 if self._world_map.actionlist == []:
                     self._world_map.actionlist.append(Agent.Action.GRAB)
+                    #TODO optimize the path and cost to (0,0)
                     x,y =result[2].pop()
                     self._world_map.moveTo(x,y)
                     return self._world_map.actionlist.pop(0)
-
-
             elif result[0] == 'MOVEMENT':
                 if self._world_map.actionlist == []:
                     self._world_map.moveTo(result[1][0],result[1][1])
@@ -82,7 +81,7 @@ class World_Map:
         self._current_status = {}
 
         self.has_visited = []
-        self.explored = []
+        self.explored = [[False for x in range(4)] for x in range(4)]
         self.available_position = {}
 
         self._store_point = {}
@@ -192,11 +191,11 @@ class World_Map:
         self.available_position[self.current_position] = []
         print("available position status", self._current_status)
         if not self._current_status['stench'] and not self._current_status['breeze']:
-            if (self.current_position[0] + 1, self.current_position[1]) not in self.has_visited:
+            if (self.current_position[0] + 1, self.current_position[1]) not in self.has_visited and self.current_position[0] + 1 < 4:
                 self.available_position[self.current_position].append((self.current_position[0] + 1, self.current_position[1]))
             if (self.current_position[0] - 1, self.current_position[1]) not in self.has_visited and self.current_position[0] - 1 >= 0:
                 self.available_position[self.current_position].append((self.current_position[0] - 1, self.current_position[1]))
-            if (self.current_position[0], self.current_position[1] + 1) not in self.has_visited:
+            if (self.current_position[0], self.current_position[1] + 1) not in self.has_visited and self.current_position[1] + 1 < 4:
                 self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] + 1))
             if (self.current_position[0], self.current_position[1] - 1) not in self.has_visited and self.current_position[1] - 1 >= 0:
                 self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] - 1))
@@ -205,7 +204,6 @@ class World_Map:
     def analysis(self):
         print("action list = ", self.actionlist)
         self.has_visited.append(self.current_position)
-        self.explored.append(self.current_position)
         if self.current_position == (0, 0) and self._current_status['breeze'] == True:
             self.actionlist.append(Agent.Action.CLIMB)
             return ['ACTION']
@@ -221,29 +219,29 @@ class World_Map:
         if self.current_position not in self.available_position.keys():
             self.check_current_position_available_direction()
 
-        for k,v in self.available_position.items():
-            if v is not None:
-                for remaining_spot in v:
-                    if remaining_spot not in self.explored:
-                        return ['MOVEMENT',remaining_spot]
         print("has visited = ", self.has_visited)
         print("available position = ", self.available_position)
         print("available position keys = ", self.available_position.keys())
         print("current position = ", self.current_position)
         print("current status = ", self._current_status)
 
-        if len(self.available_position[self.current_position]) > 0:
+        while len(self.available_position[self.current_position]) > 0:
             print(1)
             next_spot = self.available_position[self.current_position].pop()
-            # self.available_position[self.current_position].append(next_spot)
-            return ['MOVEMENT', next_spot]
-        else:
+            x,y=next_spot
+            #if is a visited node continue the while loop
+            #if is  unvisited return
+            if self.explored[x][y] == False:
+                self.explored[x][y] = True
+                # self.available_position[self.current_position].append(next_spot)
+                return ['MOVEMENT', next_spot]
+        if len(self.available_position[self.current_position]) == 0:
             print(2)
+            if self.current_position == (0,0) or len(self.has_visited)<2:
+                self.actionlist.append(Agent.Action.CLIMB)
+                return ['ACTION']
             next_spot = self.has_visited.pop()
-            self.explored = next_spot
             next_spot = self.has_visited.pop()
-            self.explored = next_spot
-
             return ['MOVEMENT', next_spot]
 
         # #if forward position has't visited yet, visit it.
