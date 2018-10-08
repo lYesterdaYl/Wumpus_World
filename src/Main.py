@@ -52,7 +52,7 @@ def main ( ):
         world = World()
         score = world.run()
         print ("Your agent scored: " + str(score))
-        return score
+        return int(score)
 
     # Important Variables
     debug      = False
@@ -205,9 +205,10 @@ def main ( ):
         print ( "[ERROR] Failure to open file." )
 
 total = 0
-for i in range(0, 10000):
+num_of_world = 10000
+for i in range(0, num_of_world):
     score = main()
     total += score
 
-average = total / 10000
+average = total / num_of_world
 print("average = ", average)

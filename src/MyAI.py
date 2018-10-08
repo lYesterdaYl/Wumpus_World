@@ -76,6 +76,8 @@ class World_Map:
         self._y = 0
         self._map = [["" for x in range(4)] for x in range(4)]
 
+        self.has_gold = False
+
         self._current_direction = 'right'
         self._number_of_move = 0
         self._current_status = {}
@@ -203,7 +205,22 @@ class World_Map:
 
     def analysis(self):
         print("action list = ", self.actionlist)
-        self.has_visited.append(self.current_position)
+
+        #if the player has gold, go home and climb
+        if self.has_gold and self.current_position == (0, 0):
+            self.actionlist.append(Agent.Action.CLIMB)
+            return ['ACTION']
+        elif self.has_gold:
+            next_spot = self.has_visited.pop()
+            return ['MOVEMENT', next_spot]
+
+        #pop out all the duplicate locations that were visited current location
+        if self.current_position in self.has_visited:
+            while self.has_visited[-1] != self.current_position:
+                self.has_visited.pop()
+        else:
+            self.has_visited.append(self.current_position)
+
         if self.current_position == (0, 0) and self._current_status['breeze'] == True:
             self.actionlist.append(Agent.Action.CLIMB)
             return ['ACTION']
@@ -213,6 +230,7 @@ class World_Map:
             return ['ACTION']
 
         if self._current_status['glitter'] == True:
+            self.has_gold = True
             return ['GRAB',(0, 0),self.has_visited]
 
 
