@@ -74,7 +74,7 @@ class World_Map:
     def __init__(self):
         self.max_x = 10
         self.max_y = 10
-        self._map = [["" for x in range(4)] for x in range(4)]
+        self._map = [["" for x in range(10)] for x in range(10)]
 
         self.has_gold = False
 
@@ -96,10 +96,10 @@ class World_Map:
         self.actionlist=[]
 
     def bumped(self):
-        if self._current_status['bump'] and self.current_direction == 'up':
-            self.max_y=self._current_position[1]
-        if self._current_status['bump'] and self.current_direction == 'right':
-            self.max_x=self._current_position[0]
+        if self._current_status['bump'] and self._current_direction == 'up':
+            self.max_y=self.current_position[1]
+        if self._current_status['bump'] and self._current_direction == 'right':
+            self.max_x=self.current_position[0]
 
 
 
