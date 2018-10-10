@@ -72,16 +72,18 @@ class MyAI ( Agent ):
 
 class World_Map:
     def __init__(self):
-        self._x = 0
-        self._y = 0
-        self._map = [["" for x in range(4)] for x in range(4)]
+        self.max_x = 10
+        self.max_y = 10
+        self._map = [["" for x in range(10)] for x in range(10)]
+
+        self.has_gold = False
 
         self._current_direction = 'right'
         self._number_of_move = 0
         self._current_status = {}
 
         self.has_visited = []
-        self.explored = [[False for x in range(4)] for x in range(4)]
+        self.explored = [[False for x in range(10)] for x in range(10)]
         self.available_position = {}
 
         self._store_point = {}
@@ -93,6 +95,18 @@ class World_Map:
         self.current_position = (0, 0)
         self.actionlist=[]
 
+    def bumped(self):
+        if self._current_status['bump'] and self._current_direction == 'up':
+            self.max_y=self.current_position[1]
+        if self._current_status['bump'] and self._current_direction == 'right':
+            self.max_x=self.current_position[0]
+
+
+
+    def localsearchTo(self, dx, dy):
+        x, y = self.current_position
+        #whi
+        pass
     def moveTo(self, dx, dy):
         print('direction',self._current_direction)
         x, y = self.current_position
@@ -191,28 +205,45 @@ class World_Map:
         self.available_position[self.current_position] = []
         print("available position status", self._current_status)
         if not self._current_status['stench'] and not self._current_status['breeze']:
-            if (self.current_position[0] + 1, self.current_position[1]) not in self.has_visited and self.current_position[0] + 1 < 4:
+            if (self.current_position[0], self.current_position[1] + 1) not in self.has_visited and self.current_position[1] + 1 < self.max_y:
+                self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] + 1))
+            if (self.current_position[0] + 1, self.current_position[1]) not in self.has_visited and self.current_position[0] + 1 < self.max_x:
                 self.available_position[self.current_position].append((self.current_position[0] + 1, self.current_position[1]))
             if (self.current_position[0] - 1, self.current_position[1]) not in self.has_visited and self.current_position[0] - 1 >= 0:
                 self.available_position[self.current_position].append((self.current_position[0] - 1, self.current_position[1]))
-            if (self.current_position[0], self.current_position[1] + 1) not in self.has_visited and self.current_position[1] + 1 < 4:
-                self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] + 1))
             if (self.current_position[0], self.current_position[1] - 1) not in self.has_visited and self.current_position[1] - 1 >= 0:
                 self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] - 1))
 
 
     def analysis(self):
         print("action list = ", self.actionlist)
-        self.has_visited.append(self.current_position)
+        self.bumped()
+        #if the player has gold, go home and climb
+        if self.has_gold and self.current_position == (0, 0):
+            self.actionlist.append(Agent.Action.CLIMB)
+            return ['ACTION']
+        elif self.has_gold:
+            next_spot = self.has_visited.pop()
+            return ['MOVEMENT', next_spot]
+
+        #pop out all the duplicate locations that were visited current location
+        if self.current_position in self.has_visited:
+            while self.has_visited[-1] != self.current_position:
+                self.has_visited.pop()
+        else:
+            self.has_visited.append(self.current_position)
+
         if self.current_position == (0, 0) and self._current_status['breeze'] == True:
             self.actionlist.append(Agent.Action.CLIMB)
             return ['ACTION']
 
         if self.current_position == (0, 0) and self._current_status['stench'] == True:
-            self.actionlist.append(Agent.Action.SHOOT)
+            self.actionlist.append(Agent.Action.CLIMB)
+            # self.actionlist.append(Agent.Action.SHOOT)
             return ['ACTION']
 
         if self._current_status['glitter'] == True:
+            self.has_gold = True
             return ['GRAB',(0, 0),self.has_visited]
 
 
