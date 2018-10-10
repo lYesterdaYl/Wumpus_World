@@ -57,8 +57,8 @@ class World():
             self.__board = [[self.__Tile() for j in range(self.__rowDimension)] for i in range(self.__colDimension)]
             self.__addFeatures(file)
         else:
-            self.__colDimension = 4
-            self.__rowDimension = 4
+            self.__colDimension = 7
+            self.__rowDimension = 7
             self.__board = [[self.__Tile() for j in range(self.__colDimension)] for i in range(self.__rowDimension)]
             self.__addFeatures()
     
