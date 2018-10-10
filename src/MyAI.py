@@ -226,7 +226,8 @@ class World_Map:
             return ['ACTION']
 
         if self.current_position == (0, 0) and self._current_status['stench'] == True:
-            self.actionlist.append(Agent.Action.SHOOT)
+            self.actionlist.append(Agent.Action.CLIMB)
+            # self.actionlist.append(Agent.Action.SHOOT)
             return ['ACTION']
 
         if self._current_status['glitter'] == True:
