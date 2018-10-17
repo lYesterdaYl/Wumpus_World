@@ -150,7 +150,7 @@ class World_Map:
         i = 0
         neighbor = self.makeneighbor()
         while i<4:
-            if
+            pass
 
 
 
@@ -285,9 +285,12 @@ class World_Map:
             self.actionlist.append(Agent.Action.CLIMB)
             return ['ACTION']
 
-        #if self.current_position == (0, 0) and self._current_status['stench'] == True:
-        #    self.actionlist.append(Agent.Action.SHOOT)
-        #    return ['ACTION']
+
+        if self.current_position == (0, 0) and self._current_status['stench'] == True:
+            self.actionlist.append(Agent.Action.CLIMB)
+            # self.actionlist.append(Agent.Action.SHOOT)
+            return ['ACTION']
+
 
         if self._current_status['glitter'] == True:
             self.has_gold = True
