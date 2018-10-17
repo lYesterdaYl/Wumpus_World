@@ -102,11 +102,59 @@ class World_Map:
             self.max_x=self.current_position[0]
 
 
+    def makeneighbor(self):
+        x, y = self.current_position
+        up = (x,y+1)
+        down = (x,y-1)
+        right = (x+1,y)
+        left = (x-1,y)
+        return [up,down,right,left]
+
+    def cost(self,dx,dy):
+        x, y = self.current_position
+        cost=0
+        if dx < x:
+            if self._current_direction == 'right':
+                cost = 2
+            if self._current_direction == 'up':
+                cost = 1
+            if self._current_direction == 'down':
+                cost = 1
+        if dx > x:
+            if self._current_direction == 'left':
+                cost = 2
+            if self._current_direction == 'up':
+                cost = 1
+            if self._current_direction == 'down':
+                cost = 1
+        if dy > y:
+            if self._current_direction == 'left':
+                cost = 1
+            if self._current_direction == 'right':
+                cost = 1
+            if self._current_direction == 'down':
+                cost = 2
+        if dy < y:
+            if self._current_direction == 'left':
+                cost = 1
+            if self._current_direction == 'right':
+                cost = 1
+            if self._current_direction == 'up':
+                cost = 2
+        return cost
+
 
     def localsearchTo(self, dx, dy):
         x, y = self.current_position
-        #whi
-        pass
+        bestfount = self.current_position
+        i = 0
+        neighbor = self.makeneighbor()
+        while i<4:
+            if
+
+
+
+
     def moveTo(self, dx, dy):
         print('direction',self._current_direction)
         x, y = self.current_position
@@ -237,9 +285,9 @@ class World_Map:
             self.actionlist.append(Agent.Action.CLIMB)
             return ['ACTION']
 
-        if self.current_position == (0, 0) and self._current_status['stench'] == True:
-            self.actionlist.append(Agent.Action.SHOOT)
-            return ['ACTION']
+        #if self.current_position == (0, 0) and self._current_status['stench'] == True:
+        #    self.actionlist.append(Agent.Action.SHOOT)
+        #    return ['ACTION']
 
         if self._current_status['glitter'] == True:
             self.has_gold = True
