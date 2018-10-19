@@ -59,7 +59,7 @@ class MyAI ( Agent ):
             elif result[0] == 'GRAB':
                 if self._world_map.actionlist == []:
                     self._world_map.actionlist.append(Agent.Action.GRAB)
-                    #x,y =result[2].pop()
+                    x,y =result[2].pop()
                     #self._world_map.moveTo(x,y)
                     return self._world_map.actionlist.pop(0)
             elif result[0] == 'MOVEMENT':
@@ -134,6 +134,7 @@ class World_Map:
             count += 1
 
         return None
+
 
     def make_neighbor(self,x,y):
         neighbor_list=[]
@@ -317,7 +318,9 @@ class World_Map:
                 for a in path:
                     self.moveTo(a[0], a[1])
                 self.current_direction = temp
-            
+            else:
+                next_spot = self.has_visited.pop()
+                return ['MOVEMENT', next_spot]
             return [0]
 
         #pop out all the duplicate locations that were visited current location
