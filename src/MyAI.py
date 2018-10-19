@@ -50,6 +50,14 @@ class MyAI ( Agent ):
         self._world_map.show_map()
 
         if len(self._world_map.actionlist) == 0:
+            # result = self._world_map.analysis()
+            # path = self._world_map.localsearch(1,0)
+            # print("action path",path)
+            # if path != None:
+            #     for a in path:
+            #         self._world_map.moveTo(a[0],a[1])
+            #     return self._world_map.actionlist.pop(0)
+            # else: print("none")
             result = self._world_map.analysis()
             print("result = ", result)
             if result[0] == 'ACTION':
@@ -57,9 +65,7 @@ class MyAI ( Agent ):
             elif result[0] == 'GRAB':
                 if self._world_map.actionlist == []:
                     self._world_map.actionlist.append(Agent.Action.GRAB)
-                    #TODO optimize the path and cost to (0,0)
-                    x,y =result[2].pop()
-                    self._world_map.moveTo(x,y)
+                    #x,y =result[2].pop()
                     return self._world_map.actionlist.pop(0)
             elif result[0] == 'MOVEMENT':
                 if self._world_map.actionlist == []:
@@ -84,6 +90,7 @@ class World_Map:
 
         self.has_visited = []
         self.explored = [[False for x in range(10)] for x in range(10)]
+        self.explored[0][0] = True
         self.available_position = {}
 
         self._store_point = {}
@@ -102,11 +109,97 @@ class World_Map:
             self.max_x=self.current_position[0]
 
 
+    def make_neighbor(self,x,y):
+        up = (x,y+1)
+        down = (x,y-1)
+        right = (x+1,y)
+        left = (x-1,y)
+        safe_neighbor=[]
+        neighbor_list=[up,down,right,left]
+        for p in neighbor_list:
+            for a in self.available_position.values():
+                if p in a:
+                    safe_neighbor.append(p)
+                    break
+            if self.explored[p[0]][p[1]] or p in self.available_position.keys():
+                if p not in safe_neighbor:
+                    safe_neighbor.append(p)
+        return safe_neighbor
 
-    def localsearchTo(self, dx, dy):
+    def calculate_cost(self,dx,dy,goal):
+        #using A* search: h(n)+g(n) find the shorst path
         x, y = self.current_position
-        #whi
-        pass
+        cost=0
+        #estimated cost h(n)
+        if dx < x:
+            if self._current_direction == 'right':
+                cost = 2
+            if self._current_direction == 'up':
+                cost = 1
+            if self._current_direction == 'down':
+                cost = 1
+        if dx > x:
+            if self._current_direction == 'left':
+                cost = 2
+            if self._current_direction == 'up':
+                cost = 1
+            if self._current_direction == 'down':
+                cost = 1
+        if dy > y:
+            if self._current_direction == 'left':
+                cost = 1
+            if self._current_direction == 'right':
+                cost = 1
+            if self._current_direction == 'down':
+                cost = 2
+        if dy < y:
+            if self._current_direction == 'left':
+                cost = 1
+            if self._current_direction == 'right':
+                cost = 1
+            if self._current_direction == 'up':
+                cost = 2
+        #calculate actual path cost g(n)
+        cost += (abs(goal[0]-dx)+abs(goal[1]-dy))
+        return cost
+
+
+    def localsearch(self, dx, dy):
+        #find the a lowest cost path to the position
+
+        count = 0
+        mincost_node=()
+        temp=[self.current_position]
+        path=[self.current_position]
+        while True:
+            mincost = 100
+            a = temp.pop()
+            #random restart
+            #print("p!",a)
+            neighbor = self.make_neighbor(a[0],a[1])
+            print("local search neighbot",neighbor)
+            for n in neighbor:
+                if n not in path:
+                    cost = self.calculate_cost(n[0],n[1],(dx,dy))
+                    if cost<mincost:
+                        mincost = cost
+                        mincost_node = n
+            print("mincost_node",mincost_node,a)
+            if mincost_node == a:
+                break
+            temp.append(mincost_node)
+            path.append(mincost_node)
+            if mincost_node == (dx,dy):
+                path.pop(0)
+                print("local_search", path)
+                return path
+            count += 1
+
+        return None
+
+
+
+
     def moveTo(self, dx, dy):
         print('direction',self._current_direction)
         x, y = self.current_position
@@ -225,8 +318,12 @@ class World_Map:
             self.actionlist.append(Agent.Action.CLIMB)
             return ['ACTION']
         elif self.has_gold:
-            next_spot = self.has_visited.pop()
-            return ['MOVEMENT', next_spot]
+            path = self.localsearch(0, 0)
+            print("action path", path)
+            if path != None:
+                for a in path:
+                    self.moveTo(a[0], a[1])
+            #return ['MOVEMENT', next_spot]
 
         #pop out all the duplicate locations that were visited current location
         if self.current_position in self.has_visited:
@@ -239,10 +336,12 @@ class World_Map:
             self.actionlist.append(Agent.Action.CLIMB)
             return ['ACTION']
 
+
         if self.current_position == (0, 0) and self._current_status['stench'] == True:
             self.actionlist.append(Agent.Action.CLIMB)
             # self.actionlist.append(Agent.Action.SHOOT)
             return ['ACTION']
+
 
         if self._current_status['glitter'] == True:
             self.has_gold = True
@@ -273,9 +372,38 @@ class World_Map:
             if self.current_position == (0,0) or len(self.has_visited)<2:
                 self.actionlist.append(Agent.Action.CLIMB)
                 return ['ACTION']
-            next_spot = self.has_visited.pop()
-            next_spot = self.has_visited.pop()
-            return ['MOVEMENT', next_spot]
+            empty =True
+            unvisited = self.available_position.values()
+            for a in unvisited:
+                if a !=[]:
+                    empty =False
+            if empty == True:
+                path = self.localsearch(0, 0)
+                if path != None:
+                    for a in path:
+                        self.moveTo(a[0], a[1])
+                    return [0]
+            m=100
+            for nq in unvisited:
+                for n in nq:
+                    cost = (abs(n[0]-self.current_position[0])+abs(n[1]-self.current_position[1]))
+                    if cost<m:
+                        m=cost
+                        next_spot=n
+            print("next_spot",next_spot)
+
+            path = self.localsearch(next_spot[0],next_spot[1])
+            print("action path", path)
+            for k in list(self.available_position.keys()):
+                if next_spot in self.available_position[k]:
+                    self.available_position[k].remove(next_spot)
+            if path != None:
+                for a in path:
+                    self.moveTo(a[0], a[1])
+            return [0]
+            #next_spot = self.has_visited.pop()
+            #next_spot = self.has_visited.pop()
+            #return ['MOVEMENT', next_spot]
 
         # #if forward position has't visited yet, visit it.
         # if self.get_current_direction_forward_position() not in self.has_visited and not self._current_status['stench'] and not self._current_status['breeze']:
