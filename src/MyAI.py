@@ -317,8 +317,6 @@ class World_Map:
                 self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] - 1))
 
     def analysis(self):
-        # if self._number_of_move > 30:
-        #     self.has_gold = True
         print("action list = ", self.actionlist)
         self.bumped()
         #if the player has gold, go home and climb

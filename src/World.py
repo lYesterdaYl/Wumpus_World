@@ -30,8 +30,6 @@ class World():
     # ===============================================================   
     
     def __init__ ( self, debug = False, randomAI = False, manualAI = False, file = None ):
-        self._size = random.randint(4, 7)
-
         # Operation Flags
         self.__debug        = debug
         self.__manualAI      = manualAI
@@ -59,8 +57,8 @@ class World():
             self.__board = [[self.__Tile() for j in range(self.__rowDimension)] for i in range(self.__colDimension)]
             self.__addFeatures(file)
         else:
-            self.__colDimension = self._size
-            self.__rowDimension = self._size
+            self.__colDimension = 7
+            self.__rowDimension = 7
             self.__board = [[self.__Tile() for j in range(self.__colDimension)] for i in range(self.__rowDimension)]
             self.__addFeatures()
     
@@ -74,7 +72,7 @@ class World():
                 self.__printWorldInfo()
                 
                 if not self.__manualAI:
-                    # Pause the game, only if manualAI isn't7 on
+                    # Pause the game, only if manualAI isn't on
                     # because manualAI pauses for us
                     input("Press ENTER to continue...")
                         
