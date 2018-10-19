@@ -205,10 +205,15 @@ def main ( ):
         print ( "[ERROR] Failure to open file." )
 
 total = 0
+win_count = 0
+
 num_of_world = 10000
 for i in range(0, num_of_world):
     score = main()
+    if score > 500:
+        win_count += 1
     total += score
 
 average = total / num_of_world
 print("average = ", average)
+print("win rate = ", win_count/num_of_world)

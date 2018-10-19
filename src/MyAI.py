@@ -216,6 +216,8 @@ class World_Map:
 
 
     def analysis(self):
+        # if self._number_of_move > 30:
+        #     self.has_gold = True
         print("action list = ", self.actionlist)
         self.bumped()
         #if the player has gold, go home and climb
