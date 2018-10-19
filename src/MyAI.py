@@ -60,6 +60,8 @@ class MyAI ( Agent ):
             # else: print("none")
             result = self._world_map.analysis()
             print("result = ", result)
+            if result[0] == 0:
+                return self._world_map.actionlist.pop(0)
             if result[0] == 'ACTION':
                 return self._world_map.actionlist.pop(0)
             elif result[0] == 'GRAB':
@@ -105,17 +107,24 @@ class World_Map:
     def bumped(self):
         if self._current_status['bump'] and self._current_direction == 'up':
             self.max_y=self.current_position[1]
+            self.current_position = (self.current_position[0],self.current_position[1] -1)
         if self._current_status['bump'] and self._current_direction == 'right':
             self.max_x=self.current_position[0]
+            self.current_position = (self.current_position[0]-1,self.current_position[1])
 
 
     def make_neighbor(self,x,y):
-        up = (x,y+1)
-        down = (x,y-1)
-        right = (x+1,y)
-        left = (x-1,y)
+        neighbor_list=[]
+        up = (x, y+1)
+        neighbor_list.append(up)
+        down = (x, y-1)
+        neighbor_list.append(down)
+        right = (x+1, y)
+        neighbor_list.append(right)
+        left = (x-1, y)
+        neighbor_list.append(left)
         safe_neighbor=[]
-        neighbor_list=[up,down,right,left]
+
         for p in neighbor_list:
             for a in self.available_position.values():
                 if p in a:
@@ -307,7 +316,6 @@ class World_Map:
             if (self.current_position[0], self.current_position[1] - 1) not in self.has_visited and self.current_position[1] - 1 >= 0:
                 self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] - 1))
 
-
     def analysis(self):
         print("action list = ", self.actionlist)
         self.bumped()
@@ -319,8 +327,11 @@ class World_Map:
             path = self.localsearch(0, 0)
             print("action path", path)
             if path != None:
+                temp = self._current_direction
                 for a in path:
                     self.moveTo(a[0], a[1])
+                self.current_direction=temp
+
             #return ['MOVEMENT', next_spot]
 
         #pop out all the duplicate locations that were visited current location
@@ -351,7 +362,7 @@ class World_Map:
 
         print("has visited = ", self.has_visited)
         print("available position = ", self.available_position)
-        print("available position keys = ", self.available_position.keys())
+        print("available position values = ", self.available_position.values())
         print("current position = ", self.current_position)
         print("current status = ", self._current_status)
 
@@ -378,17 +389,33 @@ class World_Map:
             if empty == True:
                 path = self.localsearch(0, 0)
                 if path != None:
+                    temp = self._current_direction
                     for a in path:
                         self.moveTo(a[0], a[1])
+                    self._current_direction=temp
                     return [0]
             m=100
+            next_spot=()
             for nq in unvisited:
                 for n in nq:
-                    cost = (abs(n[0]-self.current_position[0])+abs(n[1]-self.current_position[1]))
-                    if cost<m:
-                        m=cost
-                        next_spot=n
-            print("next_spot",next_spot)
+                    if n!=[]:
+                        cost = (abs(n[0]-self.current_position[0])+abs(n[1]-self.current_position[1]))
+                        print("n", n, cost, m)
+                        if cost<m and n!= self.current_position and self.explored[n[0]][n[1]] !=True:
+                            m=cost
+                            next_spot=n
+            print("next_spot", next_spot)
+            if next_spot==():
+                path = self.localsearch(0, 0)
+                if path != None:
+                    temp = self._current_direction
+
+                    for a in path:
+                        self.moveTo(a[0], a[1])
+
+                    self._current_direction=temp
+                    return [0]
+
 
             path = self.localsearch(next_spot[0],next_spot[1])
             print("action path", path)
@@ -396,8 +423,13 @@ class World_Map:
                 if next_spot in self.available_position[k]:
                     self.available_position[k].remove(next_spot)
             if path != None:
+                temp = self._current_direction
+
                 for a in path:
                     self.moveTo(a[0], a[1])
+
+                self._current_direction=temp
+            self.explored[next_spot[0]][next_spot[1]] = True
             return [0]
             #next_spot = self.has_visited.pop()
             #next_spot = self.has_visited.pop()
