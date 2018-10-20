@@ -383,64 +383,60 @@ class World_Map:
             if self.current_position == (0,0) or len(self.has_visited)<2:
                 self.actionlist.append(Agent.Action.CLIMB)
                 return ['ACTION']
-            empty =True
-            unvisited = self.available_position.values()
-            for a in unvisited:
-                if a !=[]:
-                    empty =False
-            if empty == True:
-                path = self.localsearch(0, 0)
-                if path != None:
-                    temp = self._current_direction
-                    for a in path:
-                        self.moveTo(a[0], a[1])
-                    self._current_direction=temp
-                    return [0]
-            m=100
-            next_spot=()
-            for nq in unvisited:
-                for n in nq:
-                    if n!=[]:
-                        cost = (abs(n[0]-self.current_position[0])+abs(n[1]-self.current_position[1]))
-                        print("n", n, cost, m)
-                        if cost<m and n!= self.current_position and self.explored[n[0]][n[1]] !=True:
-                            m=cost
-                            next_spot=n
-            print("next_spot", next_spot)
-            if next_spot==():
-                path = self.localsearch(0, 0)
-                if path != None:
-                    temp = self._current_direction
+            # empty =True
+            # unvisited = self.available_position.values()
+            # for a in unvisited:
+            #     if a !=[]:
+            #         empty =False
+            # if empty == True:
+            #     path = self.localsearch(0, 0)
+            #     if path != None:
+            #         temp = self._current_direction
+            #         for a in path:
+            #             self.moveTo(a[0], a[1])
+            #         self._current_direction=temp
+            #         return [0]
+            # m=100
+            # next_spot=()
+            # for nq in unvisited:
+            #     for n in nq:
+            #         if n!=[]:
+            #             cost = (abs(n[0]-self.current_position[0])+abs(n[1]-self.current_position[1]))
+            #             print("n", n, cost, m)
+            #             if cost<m and n!= self.current_position and self.explored[n[0]][n[1]] !=True:
+            #                 m=cost
+            #                 next_spot=n
+            # print("next_spot", next_spot)
+            # if next_spot==():
+            #     path = self.localsearch(0, 0)
+            #     if path != None:
+            #         temp = self._current_direction
+            #
+            #         for a in path:
+            #             self.moveTo(a[0], a[1])
+            #
+            #         self._current_direction=temp
+            #         return [0]
+            #
+            #
+            # path = self.localsearch(next_spot[0],next_spot[1])
+            # print("action path", path)
+            # for k in list(self.available_position.keys()):
+            #     if next_spot in self.available_position[k]:
+            #         self.available_position[k].remove(next_spot)
+            # if path != None:
+            #     temp = self._current_direction
+            #
+            #     for a in path:
+            #         self.moveTo(a[0], a[1])
+            #
+            #     self._current_direction=temp
+            # self.explored[next_spot[0]][next_spot[1]] = True
+            # return [0]
+            next_spot = self.has_visited.pop()
+            next_spot = self.has_visited.pop()
+            return ['MOVEMENT', next_spot]
 
-                    for a in path:
-                        self.moveTo(a[0], a[1])
-
-                    self._current_direction=temp
-                    return [0]
-
-
-            path = self.localsearch(next_spot[0],next_spot[1])
-            print("action path", path)
-            for k in list(self.available_position.keys()):
-                if next_spot in self.available_position[k]:
-                    self.available_position[k].remove(next_spot)
-            if path != None:
-                temp = self._current_direction
-
-                for a in path:
-                    self.moveTo(a[0], a[1])
-
-                self._current_direction=temp
-            self.explored[next_spot[0]][next_spot[1]] = True
-            return [0]
-            #next_spot = self.has_visited.pop()
-            #next_spot = self.has_visited.pop()
-            #return ['MOVEMENT', next_spot]
-
-        # #if forward position has't visited yet, visit it.
-        # if self.get_current_direction_forward_position() not in self.has_visited and not self._current_status['stench'] and not self._current_status['breeze']:
-        #     self.has_visited.append(self.get_current_direction_forward_position())
-        #     return ['MOVEMENT', self.get_current_direction_forward_position()]
 
 
 
