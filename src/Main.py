@@ -205,17 +205,21 @@ def main ( ):
     except Exception:
         print ( "[ERROR] Failure to open file." )
 
-main()
+# main()
 total = 0
 win_count = 0
+dead = []
 
-# num_of_world = 10000
-# for i in range(0, num_of_world):
-#     score = main()
-#     if score > 500:
-#         win_count += 1
-#     total += score
-#
-# average = total / num_of_world
-# print("average = ", average)
-# print("win rate = ", win_count/num_of_world)
+num_of_world = 100000
+for i in range(0, num_of_world):
+    score = main()
+    if score > 500:
+        win_count += 1
+    if score < -500:
+        dead.append(score)
+    total += score
+
+average = total / num_of_world
+print("average = ", average)
+print("dead = ", dead)
+print("win rate = ", win_count/num_of_world)
