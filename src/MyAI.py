@@ -50,6 +50,7 @@ class MyAI ( Agent ):
         self._world_map.show_map()
 
         if len(self._world_map.actionlist) == 0:
+            #self._world_map.
             result = self._world_map.analysis()
             print("result = ", result)
             if result[0] == 0:
@@ -80,11 +81,13 @@ class World_Map:
         self.has_gold = False
 
         self._current_direction = 'right'
+        self.final_direction = ''
         self._number_of_move = 0
         self._current_status = {}
 
         self.has_visited = []
         self.explored = [[False for x in range(10)] for x in range(10)]
+        self.explored[0][0] =True
         self.available_position = {}
 
         self._store_point = {}
@@ -200,6 +203,8 @@ class World_Map:
     def moveTo(self, dx, dy):
         print('direction',self._current_direction)
         x, y = self.current_position
+        if dx==x and dy==y:
+            return
         # go left
         if dx < x:
             if self._current_direction == 'right':
@@ -304,6 +309,13 @@ class World_Map:
             if (self.current_position[0], self.current_position[1] - 1) not in self.has_visited and self.current_position[1] - 1 >= 0:
                 self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] - 1))
 
+    def is_empty(self,available_position):
+        empty = True
+        unvisited = self.available_position.values()
+        for a in unvisited:
+            if a != []:
+                empty = False
+        return empty
 
     def analysis(self):
         print("action list = ", self.actionlist)
@@ -319,7 +331,7 @@ class World_Map:
                 temp = self._current_direction
                 for a in path:
                     self.moveTo(a[0], a[1])
-                self.current_direction = temp
+                #self._current_direction = temp
             else:
                 next_spot = self.has_visited.pop()
                 return ['MOVEMENT', next_spot]
@@ -367,12 +379,43 @@ class World_Map:
                 return ['MOVEMENT', next_spot]
         if len(self.available_position[self.current_position]) == 0:
             print(2)
-            if self.current_position == (0,0) or len(self.has_visited)<2:
+            if self.current_position == (0,0) :
                 self.actionlist.append(Agent.Action.CLIMB)
                 return ['ACTION']
+
+            if self.is_empty(self.available_position):
+                path = self.localsearch(0, 0)
+                print("Empty go home!", path)
+                if path != None:
+                    temp = self._current_direction
+                    for a in path:
+                        self.moveTo(a[0], a[1])
+                    #self._current_direction = temp
+                    return[0]
+                else:
+                    next_spot = self.has_visited.pop()
+                    next_spot = self.has_visited.pop()
+                    return ['MOVEMENT', next_spot]
+
+            m = 100
+            next_spot = ()
+            for nq in self.available_position.values():
+                for n in nq:
+                    if n != []:
+                        cost = (abs(n[0] - self.current_position[0]) + abs(n[1] - self.current_position[1]))
+                        print("n", n, cost, m)
+                        if cost < m and n != self.current_position and self.explored[n[0]][n[1]] != True:
+                            m = cost
+                            next_spot = n
+            if next_spot !=():
+                print("next spot" ,next_spot)
+
             next_spot = self.has_visited.pop()
             next_spot = self.has_visited.pop()
             return ['MOVEMENT', next_spot]
+
+            #if path ==  None:
+
 
         # #if forward position has't visited yet, visit it.
         # if self.get_current_direction_forward_position() not in self.has_visited and not self._current_status['stench'] and not self._current_status['breeze']:
