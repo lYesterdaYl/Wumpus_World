@@ -99,8 +99,10 @@ class World_Map:
     def bumped(self):
         if self._current_status['bump'] and self._current_direction == 'up':
             self.max_y=self.current_position[1]
+            self.current_position = (self.current_position[0], self.current_position[1] - 1)
         if self._current_status['bump'] and self._current_direction == 'right':
             self.max_x=self.current_position[0]
+            self.current_position = (self.current_position[0] - 1, self.current_position[1])
 
     def localsearch(self, dx, dy):
         # find the a lowest cost path to the position
