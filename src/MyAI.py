@@ -77,9 +77,9 @@ class World_Map:
         self.max_x = 10
         self.max_y = 10
         self._map = [["" for x in range(10)] for x in range(10)]
-
+        self.count = 0
         self.has_gold = False
-
+        self.wumpus_position=()
         self._current_direction = 'right'
         self.final_direction = ''
         self._number_of_move = 0
@@ -94,7 +94,7 @@ class World_Map:
 
         self._safe_position = [[False for x in range(4)] for y in range(4)]
         self._breeze_position = [[False for x in range(4)] for y in range(4)]
-        self._stench_position = [[False for x in range(4)] for y in range(4)]
+        self._stench_position = [[False for x in range(10)] for y in range(10)]
         self._Pit_position = [[False for x in range(4)] for y in range(4)]
         self.current_position = (0, 0)
         self.actionlist=[]
@@ -163,6 +163,40 @@ class World_Map:
                     safe_neighbor.append(p)
         return safe_neighbor
 
+    def find_Wumpus_position(self):
+        w_position=()
+        x,y=self.current_position
+        if self._stench_position[x+2][y] == True:
+            w_position = (x+1,y)
+        elif self._stench_position[x][y-2] == True:
+            w_position = (x,y-1)
+        elif self._stench_position[x][y+2] == True:
+            w_position = (x,y+1)
+        elif self._stench_position[x-2][y] == True:
+            w_position = (x-1,y)
+        elif self._stench_position[x+1][y+1]:
+            if self.explored[x][y+1]==True:
+                w_position = (x+1,y)
+            elif self.explored[x][y+1]==True:
+                w_position = (x + 1, y)
+        elif self._stench_position[x+1][y-1]:
+            if self.explored[x][y-1]==True:
+                w_position = (x+1,y)
+            elif self.explored[x+1][y] == True:
+                w_position = (x, y-1)
+        elif self._stench_position[x-1][y+1]:
+            if self.explored[x][y + 1] == True:
+                w_position = (x-1,y)
+            elif self.explored[x-1][y] == True:
+                w_position = (x,y+1)
+        elif self._stench_position[x-1][y-1] == True:
+            if self.explored[x][y-1] == True:
+                w_position = (x-1,y)
+            elif self.explored[x-1][y] == True:
+                w_position = (x,y-1)
+        return w_position
+
+
     def calculate_cost(self,dx,dy,goal):
         #using A* search: h(n)+g(n) find the shorst path
         x, y = self.current_position
@@ -200,7 +234,7 @@ class World_Map:
         cost += (abs(goal[0]-dx)+abs(goal[1]-dy))
         return cost
 
-    def moveTo(self, dx, dy):
+    def faceTo(self, dx, dy):
         print('direction',self._current_direction)
         x, y = self.current_position
         if dx==x and dy==y:
@@ -215,8 +249,7 @@ class World_Map:
             if self._current_direction == 'down':
                 self.actionlist.append(Agent.Action.TURN_RIGHT)
             self._current_direction = 'left'
-            self.actionlist.append(Agent.Action.FORWARD)
-            self.current_position = (x - 1, y)
+            self.current_position = (x-1,y)
             self._number_of_move += 1
         # go right
         if dx > x:
@@ -228,7 +261,6 @@ class World_Map:
             if self._current_direction == 'down':
                 self.actionlist.append(Agent.Action.TURN_LEFT)
             self._current_direction = 'right'
-            self.actionlist.append(Agent.Action.FORWARD)
             self.current_position = (x + 1, y)
             self._number_of_move += 1
         # go up
@@ -241,8 +273,7 @@ class World_Map:
                 self.actionlist.append(Agent.Action.TURN_LEFT)
                 self.actionlist.append(Agent.Action.TURN_LEFT)
             self._current_direction = 'up'
-            self.actionlist.append(Agent.Action.FORWARD)
-            self.current_position = (x, y + 1)
+            self.current_position = (x , y+1)
             self._number_of_move += 1
         # go down
         if dy < y:
@@ -254,10 +285,69 @@ class World_Map:
                 self.actionlist.append(Agent.Action.TURN_LEFT)
                 self.actionlist.append(Agent.Action.TURN_LEFT)
             self._current_direction = 'down'
-            self.actionlist.append(Agent.Action.FORWARD)
-            self.current_position = (x, y - 1)
+            self.current_position = (x , y-1)
             self._number_of_move += 1
-        print('move:' , self.actionlist)
+
+        print('face' , self._current_direction)
+
+    def moveTo(self, dx, dy):
+            print('direction', self._current_direction)
+            x, y = self.current_position
+            if dx == x and dy == y:
+                return
+            # go left
+            if dx < x:
+                if self._current_direction == 'right':
+                    self.actionlist.append(Agent.Action.TURN_RIGHT)
+                    self.actionlist.append(Agent.Action.TURN_RIGHT)
+                if self._current_direction == 'up':
+                    self.actionlist.append(Agent.Action.TURN_LEFT)
+                if self._current_direction == 'down':
+                    self.actionlist.append(Agent.Action.TURN_RIGHT)
+                self._current_direction = 'left'
+                self.actionlist.append(Agent.Action.FORWARD)
+                self.current_position = (x - 1, y)
+                self._number_of_move += 1
+            # go right
+            if dx > x:
+                if self._current_direction == 'left':
+                    self.actionlist.append(Agent.Action.TURN_LEFT)
+                    self.actionlist.append(Agent.Action.TURN_LEFT)
+                if self._current_direction == 'up':
+                    self.actionlist.append(Agent.Action.TURN_RIGHT)
+                if self._current_direction == 'down':
+                    self.actionlist.append(Agent.Action.TURN_LEFT)
+                self._current_direction = 'right'
+                self.actionlist.append(Agent.Action.FORWARD)
+                self.current_position = (x + 1, y)
+                self._number_of_move += 1
+            # go up
+            if dy > y:
+                if self._current_direction == 'left':
+                    self.actionlist.append(Agent.Action.TURN_RIGHT)
+                if self._current_direction == 'right':
+                    self.actionlist.append(Agent.Action.TURN_LEFT)
+                if self._current_direction == 'down':
+                    self.actionlist.append(Agent.Action.TURN_LEFT)
+                    self.actionlist.append(Agent.Action.TURN_LEFT)
+                self._current_direction = 'up'
+                self.actionlist.append(Agent.Action.FORWARD)
+                self.current_position = (x, y + 1)
+                self._number_of_move += 1
+            # go down
+            if dy < y:
+                if self._current_direction == 'left':
+                    self.actionlist.append(Agent.Action.TURN_LEFT)
+                if self._current_direction == 'right':
+                    self.actionlist.append(Agent.Action.TURN_RIGHT)
+                if self._current_direction == 'up':
+                    self.actionlist.append(Agent.Action.TURN_LEFT)
+                    self.actionlist.append(Agent.Action.TURN_LEFT)
+                self._current_direction = 'down'
+                self.actionlist.append(Agent.Action.FORWARD)
+                self.current_position = (x, y - 1)
+                self._number_of_move += 1
+            print('move:', self.actionlist)
 
     def show_map(self):
         # self._map[0][1] = 2
@@ -357,8 +447,25 @@ class World_Map:
             self.has_gold = True
             return ['GRAB',(0, 0),self.has_visited]
 
+        if self._current_status['stench'] == True and self._current_status['breeze']==False:
 
-        if self.current_position not in self.available_position.keys():
+            self._stench_position[self.current_position[0]][self.current_position[1]] = True
+            self.wumpus_position = self.find_Wumpus_position()
+
+            if self.wumpus_position != () and self.count == 0:
+                print("found w's position :",self.wumpus_position)
+
+
+                self.faceTo(self.wumpus_position[0],self.wumpus_position[1])
+                self.available_position[self.current_position] = []
+                self.actionlist.append(Agent.Action.SHOOT)
+                # todo  bug here  did not update current position
+                self.actionlist.append(Agent.Action.FORWARD)
+                self.count +=1
+                return ['ACTION']
+            else: print("Haven't find Wumpus")
+
+        if self.current_position not in self.available_position.keys() and self.current_position !=self.wumpus_position:
             self.check_current_position_available_direction()
 
         print("has visited = ", self.has_visited)

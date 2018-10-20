@@ -205,7 +205,7 @@ def main ( ):
         print ( "[ERROR] Failure to open file." )
 
 total = 0
-num_of_world = 100000
+num_of_world = 10000
 dead = []
 for i in range(0, num_of_world):
     score = main()
