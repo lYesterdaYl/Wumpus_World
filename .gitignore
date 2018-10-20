@@ -39,6 +39,7 @@ venv/Scripts/tk86t.dll
 venv/Scripts/unicodedata.pyd
 venv/Scripts/vcruntime140.dll
 venv/Scripts/winsound.pyd
+src/Worlds
 .idea/Wumpus_World.iml
 .idea/modules.xml
 *.pyc
