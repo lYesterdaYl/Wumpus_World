@@ -398,6 +398,15 @@ class World_Map:
                 self.available_position[self.current_position].append((self.current_position[0] - 1, self.current_position[1]))
             if (self.current_position[0], self.current_position[1] - 1) not in self.has_visited and self.current_position[1] - 1 >= 0:
                 self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] - 1))
+        if self.count == 1 and self._current_status['stench'] == True and self._current_status['breeze'] == False:
+            if (self.current_position[0], self.current_position[1] + 1) not in self.has_visited and self.current_position[1] + 1 < self.max_y:
+                self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] + 1))
+            if (self.current_position[0] + 1, self.current_position[1]) not in self.has_visited and self.current_position[0] + 1 < self.max_x:
+                self.available_position[self.current_position].append((self.current_position[0] + 1, self.current_position[1]))
+            if (self.current_position[0] - 1, self.current_position[1]) not in self.has_visited and self.current_position[0] - 1 >= 0:
+                self.available_position[self.current_position].append((self.current_position[0] - 1, self.current_position[1]))
+            if (self.current_position[0], self.current_position[1] - 1) not in self.has_visited and self.current_position[1] - 1 >= 0:
+                self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] - 1))
 
     def is_empty(self,available_position):
         empty = True
@@ -454,18 +463,14 @@ class World_Map:
 
             if self.wumpus_position != () and self.count == 0:
                 print("found w's position :",self.wumpus_position)
-
-
                 self.faceTo(self.wumpus_position[0],self.wumpus_position[1])
-                self.available_position[self.current_position] = []
                 self.actionlist.append(Agent.Action.SHOOT)
+                self.count += 1
                 # todo  bug here  did not update current position
                 self.actionlist.append(Agent.Action.FORWARD)
-                self.count +=1
                 return ['ACTION']
-            else: print("Haven't find Wumpus")
 
-        if self.current_position not in self.available_position.keys() and self.current_position !=self.wumpus_position:
+        if self.current_position not in self.available_position.keys():
             self.check_current_position_available_direction()
 
         print("has visited = ", self.has_visited)
