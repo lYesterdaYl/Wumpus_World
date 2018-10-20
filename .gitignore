@@ -44,3 +44,4 @@ venv/Scripts/winsound.pyd
 *.pyc
 *.xml
 .DS_Store
+/src/Worlds
