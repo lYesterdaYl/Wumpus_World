@@ -41,6 +41,7 @@ venv/Scripts/vcruntime140.dll
 venv/Scripts/winsound.pyd
 .idea/Wumpus_World.iml
 .idea/modules.xml
+src/Worlds
 *.pyc
 *.xml
 .DS_Store
