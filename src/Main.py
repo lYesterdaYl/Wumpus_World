@@ -204,15 +204,16 @@ def main ( ):
     except Exception:
         print ( "[ERROR] Failure to open file." )
 
-total = 0
-num_of_world = 10000
-dead = []
-for i in range(0, num_of_world):
-    score = main()
-    if score < -500:
-        dead.append(score)
-    total += score
-
-average = total / num_of_world
-print("average = ", average)
-print("dead = ", dead)
+main()
+# total = 0
+# num_of_world = 10000
+# dead = []
+# for i in range(0, num_of_world):
+#     score = main()
+#     if score < -500:
+#         dead.append(score)
+#     total += score
+#
+# average = total / num_of_world
+# print("average = ", average)
+# print("dead = ", dead)
