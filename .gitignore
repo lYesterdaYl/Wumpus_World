@@ -43,8 +43,10 @@ venv/Scripts/winsound.pyd
 .idea/modules.xml
 src/Worlds
 src/Main.py
-src/World.py
+src/world_generator.py
+src/Makefile
 *.pyc
 *.xml
 .DS_Store
 /src/Worlds
+*.txt
