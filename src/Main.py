@@ -207,12 +207,11 @@ def main():
         print("[ERROR] Failure to open file.")
 
 
-# main()
+main()
 total = 0
 win_count = 0
 dead = []
-
-num_of_world = 100000
+num_of_world = 10000
 for i in range(0, num_of_world):
     score = main()
     if score > 500:
