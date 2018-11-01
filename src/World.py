@@ -47,6 +47,7 @@ class World():
         self.__lastAction   = Agent.Action.CLIMB
         print(1)
         self.file = open("record.txt", "w")
+        self.input_file = file
 
         print(2)
         if randomAI:
@@ -132,8 +133,16 @@ class World():
                             death_file = open(filename, "w")
                             for line in record:
                                 death_file.write(line)
-
                         self.file = open("record.txt", "w")
+
+                        dead_txt_filename = "dead_txt_" + str(int(time.time())) + ".txt"
+                        with open(dead_txt_filename, "w") as dead_txt:
+                            print(self.input_file)
+                            for line in self.input_file:
+                                dead_txt.write(line)
+
+
+
 
 
                     return self.__score
