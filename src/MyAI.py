@@ -109,7 +109,9 @@ class World_Map:
 
     def localsearch(self, dx, dy):
         # find the a lowest cost path to the position
-
+        x,y=self.current_position
+        if (x, y) == (0, 1) or (x, y) == (1, 0):
+            return [(0,0)]
         count = 0
         mincost_node = ()
         temp = [self.current_position]
@@ -237,6 +239,7 @@ class World_Map:
     def faceTo(self, dx, dy):
         print('direction',self._current_direction)
         x, y = self.current_position
+
         if dx==x and dy==y:
             return
         # go left
@@ -390,13 +393,15 @@ class World_Map:
         self.available_position[self.current_position] = []
         print("available position status", self._current_status)
         if not self._current_status['stench'] and not self._current_status['breeze']:
-            if (self.current_position[0], self.current_position[1] + 1) not in self.has_visited and self.current_position[1] + 1 < self.max_y:
+            x1,x2,x3=self.current_position[0],self.current_position[0] + 1,self.current_position[0] - 1
+            y1,y2,y3= self.current_position[1],self.current_position[1] + 1,self.current_position[1] - 1
+            if self.explored[x1][y2]== False and self.current_position[1] + 1 < self.max_y:
                 self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] + 1))
-            if (self.current_position[0] + 1, self.current_position[1]) not in self.has_visited and self.current_position[0] + 1 < self.max_x:
+            if self.explored[x2][y1] not in self.has_visited and self.current_position[0] + 1 < self.max_x:
                 self.available_position[self.current_position].append((self.current_position[0] + 1, self.current_position[1]))
-            if (self.current_position[0] - 1, self.current_position[1]) not in self.has_visited and self.current_position[0] - 1 >= 0:
+            if self.explored[x3][y1] not in self.has_visited and self.current_position[0] - 1 >= 0:
                 self.available_position[self.current_position].append((self.current_position[0] - 1, self.current_position[1]))
-            if (self.current_position[0], self.current_position[1] - 1) not in self.has_visited and self.current_position[1] - 1 >= 0:
+            if self.explored[x1][y3] not in self.has_visited and self.current_position[1] - 1 >= 0:
                 self.available_position[self.current_position].append((self.current_position[0], self.current_position[1] - 1))
         if self.count == 1 and self._current_status['stench'] == True and self._current_status['breeze'] == False:
             if (self.current_position[0], self.current_position[1] + 1) not in self.has_visited and self.current_position[1] + 1 < self.max_y:
