@@ -37,16 +37,20 @@ class World():
         self.__manualAI = manualAI
 
         # Agent Initialization
-        self.__goldLooted = False
-        self.__hasArrow = True
-        self.__bump = False
-        self.__scream = False
-        self.__score = 0
-        self.__agentDir = 0
-        self.__agentX = 0
-        self.__agentY = 0
-        self.__lastAction = Agent.Action.CLIMB
+        self.__goldLooted   = False
+        self.__hasArrow     = True
+        self.__bump         = False
+        self.__scream       = False
+        self.__score        = 0
+        self.__agentDir     = 0
+        self.__agentX       = 0
+        self.__agentY       = 0
+        self.__lastAction   = Agent.Action.CLIMB
+        print(1)
+        self.file = open("record.txt", "w")
+        self.input_file = file
 
+        print(2)
         if randomAI:
             self.__agent = RandomAI()
         elif manualAI:
@@ -118,6 +122,28 @@ class World():
                     self.__score -= 1000
                     if self.__debug:
                         self.__printWorldInfo()
+
+                    # write dead file when agent died. copy data from record.txt
+                    if self.__score <= -1000:
+                        print(1)
+                        self.file.close()
+                        with open("record.txt", "r") as record:
+                            filename = "dead_" + str(int(time.time())) + ".txt"
+                            death_file = open(filename, "w")
+                            for line in record:
+                                death_file.write(line)
+                        self.file = open("record.txt", "w")
+
+                        dead_txt_filename = "dead_txt_" + str(int(time.time())) + ".txt"
+                        with open(dead_txt_filename, "w") as dead_txt:
+                            print(self.input_file)
+                            for line in self.input_file:
+                                dead_txt.write(line)
+
+
+
+
+
                     return self.__score
 
             elif self.__lastAction == Agent.Action.SHOOT:
