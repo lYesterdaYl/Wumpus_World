@@ -14,6 +14,7 @@ from ManualAI import ManualAI
 from RandomAI import RandomAI
 from MyAI import MyAI
 import random
+import time
 
 
 class World():
