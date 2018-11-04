@@ -101,10 +101,12 @@ class World_Map:
 
     def bumped(self):
         if self._current_status['bump'] and self._current_direction == 'up':
-            self.max_y=self.current_position[1]
+            self.max_y = self.current_position[1]
             self.current_position = (self.current_position[0], self.current_position[1] - 1)
         if self._current_status['bump'] and self._current_direction == 'right':
-            self.max_x=self.current_position[0]
+
+            self.max_x =self.current_position[0]
+            print("maxx", self.max_x)
             self.current_position = (self.current_position[0] - 1, self.current_position[1])
 
     def localsearch(self, dx, dy):
@@ -112,6 +114,7 @@ class World_Map:
         x,y=self.current_position
         if (x, y) == (0, 1) or (x, y) == (1, 0):
             return [(0,0)]
+        #if (x,y) ==(0,2)
         count = 0
         mincost_node = ()
         temp = [self.current_position]
@@ -126,6 +129,10 @@ class World_Map:
             for n in neighbor:
                 if n not in path:
                     cost = self.calculate_cost(n[0], n[1], (dx, dy))
+                    print("debug node, cost",n,cost)
+                    if cost==mincost:
+                        if self.compare_dis(n[0], n[1], (dx, dy))<self.compare_dis(mincost_node[0], mincost_node[1], (dx, dy)):
+                            mincost_node=n
                     if cost < mincost:
                         mincost = cost
                         mincost_node = n
@@ -145,14 +152,19 @@ class World_Map:
 
     def make_neighbor(self,x,y):
         neighbor_list=[]
-        up = (x, y+1)
-        neighbor_list.append(up)
-        down = (x, y-1)
-        neighbor_list.append(down)
-        right = (x+1, y)
-        neighbor_list.append(right)
-        left = (x-1, y)
-        neighbor_list.append(left)
+
+        if (y+1<self.max_y):
+            up = (x, y + 1)
+            neighbor_list.append(up)
+        if y-1 >=0:
+            down = (x, y - 1)
+            neighbor_list.append(down)
+        if (x + 1 < self.max_x):
+            right = (x + 1, y)
+            neighbor_list.append(right)
+        if x-1>=0:
+            left = (x - 1, y)
+            neighbor_list.append(left)
         safe_neighbor=[]
 
         for p in neighbor_list:
@@ -198,6 +210,10 @@ class World_Map:
                 w_position = (x,y-1)
         return w_position
 
+    def compare_dis(self,dx,dy,goal):
+        cost=0
+        cost += (abs(goal[0] - dx) + abs(goal[1] - dy))
+        return cost
 
     def calculate_cost(self,dx,dy,goal):
         #using A* search: h(n)+g(n) find the shorst path
