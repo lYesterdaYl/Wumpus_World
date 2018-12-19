@@ -42,8 +42,6 @@ venv/Scripts/winsound.pyd
 .idea/Wumpus_World.iml
 .idea/modules.xml
 src/Worlds
-src/world_generator.py
-src/Makefile
 *.pyc
 *.xml
 .DS_Store
